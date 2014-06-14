@@ -1,0 +1,32 @@
+caption: Tags
+created: 20140605211307367
+modified: 20140607155007622
+tags: $:/tags/TiddlerInfo
+title: $:/_ui/infoToolbar/tags
+type: text/vnd.tiddlywiki
+
+---
+!! Remove Tags
+
+<span class="tw-infoToolbar-tags">
+<$fieldmangler>
+<$list filter="[all[current]tags[]]">
+<$button message="tw-remove-tag" param={{!!title}} class="btn-invisible">
+{{!!title||showtag}}
+</$button>
+</$list>
+</$fieldmangler>
+</span>
+
+---
+!! Add Tags
+
+<span class="tw-infoToolbar-tags">
+<$fieldmangler>
+<$list filter="[tags[]]-[all[current]tags[]sort[title]]">
+<$button message="tw-add-tag" param={{!!title}} class="btn-invisible">
+{{!!title||showtag}}
+</$button>
+</$list>
+</$fieldmangler>
+</span>

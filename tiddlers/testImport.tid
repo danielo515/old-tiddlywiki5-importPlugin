@@ -1,0 +1,15 @@
+created: 20140611164900211
+modified: 20140613134309026
+title: testImport
+type: text/vnd.tiddlywiki
+
+\define rules()$(rule)$
+<$set name="rule" value=<<concatenate "[tag[$:/tags/conflictRule]]" ",">> >
+<$importwidget conflictRules=<<rules>> >
+<$browse/>
+</$importwidget>
+</$set>
+
+<$list filter="[tag[$:/tags/rules/conflict]]">
+<$checkbox tiddler={{!!title}} tag="$:/tags/conflictRule">{{!!caption}}</$checkbox>
+</$list>

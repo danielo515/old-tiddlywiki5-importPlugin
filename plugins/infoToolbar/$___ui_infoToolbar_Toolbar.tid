@@ -1,0 +1,9 @@
+caption: Tools
+created: 20140602162823560
+modified: 20140606161755030
+tags: customization $:/tags/TiddlerInfo
+title: $:/_ui/infoToolbar/Toolbar
+type: text/vnd.tiddlywiki
+
+<span class="tw-infoToolbar-controls"><$list filter="[all[shadows+tiddlers]tag[$:/tags/infoToolbar]!has[draft.of]]"variable="listItem"><$transclude tiddler=<<listItem>>/></$list>
+</span>

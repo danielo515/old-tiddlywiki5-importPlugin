@@ -1,0 +1,19 @@
+created: 20140613102747699
+edited: 
+modified: 20140613125658730
+offline: 
+originaltext: 
+title: New Tiddler
+type: text/vnd.tiddlywiki
+yes,originaltext: 
+
+\define nabo() $(rule)$ 
+
+<$set name="rule" value=<<concatenate "[tag[$:/tags/conflictRule]]" ",">> >
+<<nabo>>
+</$set>
+
+<$list filter="[tag[$:/tags/rules/conflict]]">
+<$checkbox tiddler={{!!title}} tag="$:/tags/conflictRule">{{!!caption}}</$checkbox>
+</$list>
+

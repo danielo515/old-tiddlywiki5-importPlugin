@@ -1,0 +1,19 @@
+created: 20140612065711329
+dependents: $:/themes/tiddlywiki/vanilla
+description: A clean theme that emphasises individual tiddlers
+modified: 20140612065711329
+name: Snow White
+plugin-type: theme
+title: $:/themes/tiddlywiki/snowwhite
+type: application/json
+version: 5.0.13-prerelease
+
+{
+    "tiddlers": {
+        "$:/themes/tiddlywiki/snowwhite/base": {
+            "title": "$:/themes/tiddlywiki/snowwhite/base",
+            "tags": "[[$:/tags/stylesheet]]",
+            "text": "\\rules only filteredtranscludeinline transcludeinline macrodef macrocallinline\n\n.sidebar-header {\n\ttext-shadow: 0 1px 0 <<colour sidebar-foreground-shadow>>;\n}\n\n.tw-tiddler-info {\n\t<<box-shadow \"inset 1px 2px 3px rgba(0,0,0,0.1)\">>\n}\n\n@media screen {\n\t.tw-tiddler-frame {\n\t\t<<box-shadow \"5px 5px 5px rgba(0, 0, 0, 0.1)\">>\n\t}\n}\n\n@media (max-width: 770px) {\n\t.tw-tiddler-frame {\n\t\t<<box-shadow none>>\n\t}\n}\n\n.tw-page-controls button svg, .tw-tiddler-controls button svg, .tw-topbar button svg {\n\t<<transition \"fill 150ms ease-in-out\">>\n}\n\n.tw-tiddler-controls button.tw-selected svg {\n\t<<filter \"drop-shadow(0px -1px 2px rgba(0,0,0,0.25))\">>\n}\n\n.tw-tiddler-frame input.tw-edit-texteditor {\n\t<<box-shadow \"inset 0 1px 8px rgba(0, 0, 0, 0.15)\">>\n}\n\n.tw-edit-tags {\n\t<<box-shadow \"inset 0 1px 8px rgba(0, 0, 0, 0.15)\">>\n}\n\n.tw-tiddler-frame .tw-edit-tags input.tw-edit-texteditor {\n\t<<box-shadow \"none\">>\n\tborder: none;\n\toutline: none;\n}\n\ncanvas.tw-edit-bitmapeditor  {\n\t<<box-shadow \"2px 2px 5px rgba(0, 0, 0, 0.5)\">>\n}\n\n.tw-drop-down {\n\tborder-radius: 4px;\n\t<<box-shadow \"2px 2px 10px rgba(0, 0, 0, 0.5)\">>\n}\n\n.tw-block-dropdown {\n\tborder-radius: 4px;\n\t<<box-shadow \"2px 2px 10px rgba(0, 0, 0, 0.5)\">>\n}\n\n.tw-modal-displayed {\n\t-webkit-filter: blur(4px);\n}\n\n.modal {\n\tborder-radius: 6px;\n\t<<box-shadow \"0 3px 7px rgba(0,0,0,0.3)\">>\n}\n\n.modal-footer {\n\tborder-radius: 0 0 6px 6px;\n\t<<box-shadow \"inset 0 1px 0 #fff\">>;\n}\n\n\n.tw-alert {\n\tborder-radius: 6px;\n\t<<box-shadow \"0 3px 7px rgba(0,0,0,0.6)\">>\n}\n\n.tw-notification {\n\tborder-radius: 6px;\n\t<<box-shadow \"0 3px 7px rgba(0,0,0,0.3)\">>\n\ttext-shadow: 0 1px 0 rgba(255,255,255, 0.8);\n}\n\n.tw-sidebar-lists .tw-tab-divider {\n\t<<background-linear-gradient \"left, rgb(216,216,216) 0%, rgb(236,236,236) 250px\">>\n}\n\n.tw-more-sidebar .tw-tab-buttons button {\n\t<<background-linear-gradient \"left, rgb(236,236,236) 0%, rgb(224,224,224) 100%\">>\n}\n\n.tw-more-sidebar .tw-tab-buttons button.tw-tab-selected {\n\t<<background-linear-gradient \"left, rgb(236,236,236) 0%, rgb(248,248,248) 100%\">>\n}\n\n.tw-message-box img {\n\t<<box-shadow \"1px 1px 3px rgba(0,0,0,0.5)\">>\n}\n"
+        }
+    }
+}

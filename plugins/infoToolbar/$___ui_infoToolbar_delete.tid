@@ -1,0 +1,7 @@
+created: 20140602170528974
+modified: 20140605204139598
+tags: $:/tags/infoToolbar
+title: $:/_ui/infoToolbar/delete
+type: text/vnd.tiddlywiki
+
+<$button message="tw-delete-tiddler" class="btn-invisible">{{$:/core/images/delete-button}}</$button>

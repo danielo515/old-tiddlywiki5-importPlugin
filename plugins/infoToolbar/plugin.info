@@ -1,0 +1,9 @@
+{
+	"title": "$:/plugins/danielo/infoToolbar",
+	"description": "adds some controls under the info section of each tiddler",
+	"author": "DanieloRodrigez",
+	"version": "0.0.3",
+	"core-version": ">=5.0.8",
+	"source": "https://github.com/danielo515/tiddlywiki5-Plugins-infoToolbar",
+	"plugin-type": "plugin"
+}

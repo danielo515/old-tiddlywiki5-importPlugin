@@ -1,0 +1,7 @@
+created: 20140602173108629
+modified: 20140605204133571
+tags: $:/tags/infoToolbar
+title: $:/_ui/infoToolbar/clone
+type: text/vnd.tiddlywiki
+
+<span title="Clone this tiddler"><$button message="tw-new-tiddler" class="btn-invisible" param=<<currentTiddler>>>{{$:/images/clone-tiddler-button}}</$button></span>
