@@ -50,41 +50,19 @@ importWidget.prototype.execute = function() {
 	var importrules = this.getAttribute("importRules");
 	importrules = importrules && importrules.length > 0 ? importrules.split(";") : [];
 
-	var rules={
-	 "plugins": function(tiddler,existing){
-	 if(tiddler.hasField("plugin-type") && tiddler.hasField("version") && existing.hasField("plugin-type") && existing.hasField("version"))
-		// Reject the incoming plugin if it is older
-		var status=$tw.utils.checkVersions(existing.fields.version,tiddler.fields.version) ? false : true;
+	var rules=this._rules();
 
-		return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, "Pugins"] }
-	  },
-     "newestwins" :
-	 function(tiddler,existing){ status=tiddler.fields.modified > existing.fields.modified;
-	 return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, status? "Newer than existing" :"Newer already exist" ] } },
-     "oldestwins" :
-     function(tiddler,existing){ status=tiddler.fields.modified < existing.fields.modified
-     return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, "Older"] }},
-     "longertextwins" :
-     function(tiddler,existing){ return tiddler.fields.text.length > existing.fields.text.length },
-	 "includetags" : function(tagsArr){
-	                 return function(tiddler){ var result=true;
-					        for(var i=0; result && i<tagsArr.length;i++){ result = tiddler.hasTag(tagsArr[i]);
-							console.log("Tag ",tagsArr[i],result);}
-							return result;
-							}  },
-	"excludetags" : function(tagsArr){ return ! this.includetags(tagsArr) },
-    };
-
-
-    this.conflictRules=[ rules.plugins,this.ignoreIdenticalTiddlers ]; //ignore Identical the very first rule
+    this.conflictRules=[ rules.getRule("plugins"), rules.getRule("ignoreIdenticalTiddlers") ]; //ignore Identical the very first rule
 	this.importRules=[];
 	//construct the import rules array
 	importrules.forEach(
 	    function(rule) { rule=rule.split(":");
-		                 self.importRules.push( rules[rule[0].toLowerCase()]( rule[1].split(",") ) ) }
+		                 self.importRules.push(
+		                     rules.getRule( rule[0].toLowerCase() )( rule[1].split(",") )
+		                     )}
 						);
 	//construct the conflict rules array
-    for(var i=0; i<conflictRules.length; i++) this.conflictRules.push( rules[conflictRules[i]] );
+    for(var i=0; i<conflictRules.length; i++) this.conflictRules.push( rules.getRule(conflictRules[i]) );
 
 	// Construct the child widgets
 	this.makeChildWidgets();
@@ -104,15 +82,18 @@ importWidget.prototype.refresh = function(changedTiddlers) {
 };
 
 
-importWidget.prototype.ignoreIdenticalTiddlers = function (tiddler,existing){
+/*Rules closure*/
+importWidget.prototype._rules=function(){
+var IMPORTED="Imported",NOTIMPORTED="Not Imported";
+
+function ignoreIdenticalTiddlers (tiddler,existing){
     console.log(tiddler.fields.title," vs ",existing.fields.title);
-    var checkedFields=[],status,IMPORTED="Imported",NOTIMPORTED="Not Imported";
+    var checkedFields=[],status;
     if( identicalFields(tiddler,existing) && identicalFields(existing,tiddler) ){
-        console.log(" They are Identical!");
 		status=false; //not import because are identical
 	}else status=true;
 
-	return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, "Older"] }
+	return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, "Identical"] }
 
     function identicalFields(a,b){
         var af=a.fields, bf=b.fields,identical=true;
@@ -127,6 +108,48 @@ importWidget.prototype.ignoreIdenticalTiddlers = function (tiddler,existing){
             return true;
     }
 
+}
+
+function getResult(status,title /*category*/)
+{
+    var category=[ title, status ? IMPORTED : NOTIMPORTED ];
+    var categories=Array.prototype.slice.call(arguments, 2);
+    for(var i=0; i<categories.length;i++) category.push(categories[i]);
+
+    return { status:status,category:category }
+}
+
+var rulesStore={
+     "ignoreIdenticalTiddlers" : ignoreIdenticalTiddlers,
+	 "plugins": function(tiddler,existing){
+	 var status=true;
+	 if(tiddler.hasField("plugin-type") && tiddler.hasField("version") && existing.hasField("plugin-type") && existing.hasField("version"))
+		// Reject the incoming plugin if it is older
+		status= $tw.utils.checkVersions(existing.fields.version,tiddler.fields.version) ? false : true;
+
+		return getResult(status, tiddler.fields.title , "Pugins")
+	  },
+     "newestwins" :
+	 function(tiddler,existing){ status=tiddler.fields.modified > existing.fields.modified;
+	 return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, status? "Newer than existing" :"Newer already exist" ] } },
+     "oldestwins" :
+     function(tiddler,existing){ status=tiddler.fields.modified < existing.fields.modified
+     return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, "Older"] }},
+     "longertextwins" :
+     function(tiddler,existing){ return tiddler.fields.text.length > existing.fields.text.length },
+	 "includetags" : function(tagsArr){
+	                 return function(tiddler){ var result=true;
+					        for(var i=0; result && i<tagsArr.length;i++){ result = tiddler.hasTag(tagsArr[i]);
+							console.log("Tag ",tagsArr[i],result);}
+							return result;
+							}  },
+	"excludetags" : function(tagsArr){ return ! this.includetags(tagsArr) },
+    };
+
+
+return {
+         getRule : function(ruleName){ return rulesStore[ruleName] }
+       }
 };
 
 
