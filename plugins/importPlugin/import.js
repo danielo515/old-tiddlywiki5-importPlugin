@@ -130,10 +130,10 @@ var rulesStore={
 		return getResult(status, tiddler.fields.title , "Pugins")
 	  },
      "newestwins" :
-	 function(tiddler,existing){ status=tiddler.fields.modified > existing.fields.modified;
+	 function(tiddler,existing){ var status=tiddler.fields.modified > existing.fields.modified;
 	 return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, status? "Newer than existing" :"Newer already exist" ] } },
      "oldestwins" :
-     function(tiddler,existing){ status=tiddler.fields.modified < existing.fields.modified
+     function(tiddler,existing){ var status=tiddler.fields.modified < existing.fields.modified
      return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, "Older"] }},
      "longertextwins" :
      function(tiddler,existing){ return tiddler.fields.text.length > existing.fields.text.length },
