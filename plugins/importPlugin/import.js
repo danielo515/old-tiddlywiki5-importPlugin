@@ -50,10 +50,16 @@ importWidget.prototype.execute = function() {
 	importrules = importrules && importrules.length > 0 ? importrules.split(";") : [];
 
 	var rules={
+	 "plugins": function(tiddler,existing){
+	 if(tiddler.hasField("plugin-type") && tiddler.hasField("version") && existing.hasField("plugin-type") && existing.hasField("version"))
+		// Reject the incoming plugin if it is older
+		if($tw.utils.checkVersions(existing.fields.version,tiddler.fields.version)) return false;
+		return true
+	  },
      "newestwins" :
 	 function(tiddler,existing){ return tiddler.fields.modified > existing.fields.modified },
      "oldestwins" :
-     function(a,b){ return tiddler.fields.modified < existing.fields.modified },
+     function(tiddler,existing){ return tiddler.fields.modified < existing.fields.modified },
      "longertextwins" :
      function(tiddler,existing){ return tiddler.fields.text.length > existing.fields.text.length },
 	 "includetags" : function(tagsArr){
@@ -66,7 +72,7 @@ importWidget.prototype.execute = function() {
     };
 
 
-    this.conflictRules=[ this.ignoreIdenticalTiddlers ]; //ignore Identical the very first rule
+    this.conflictRules=[ rules.plugins,this.ignoreIdenticalTiddlers ]; //ignore Identical the very first rule
 	this.importRules=[];
 	//construct the import rules array
 	importrules.forEach(
@@ -120,24 +126,19 @@ importWidget.prototype.ignoreIdenticalTiddlers = function (tiddler,existing){
 
 
 importWidget.prototype.importtiddler = function (tiddler) {
-    var importThisOne = true, title=tiddler.fields.title;
+    var importThisOne = true, title=tiddler.fields.title,self=this;;
 	this.newTiddlers=[];
 	var existingTiddler = this.wiki.getTiddler(title);
-	// Check if we're dealing with a plugin
-	if(tiddler && tiddler.hasField("plugin-type") && tiddler.hasField("version") && existingTiddler && existingTiddler.hasField("plugin-type") && existingTiddler.hasField("version")) {
-		// Reject the incoming plugin if it is older
-		if($tw.utils.checkVersions(existingTiddler.fields.version,tiddler.fields.version)) {
-			return false;
-		}
-	}
+	function reportTiddler(title,category/*,subcategories*/)
+	{console.log(Array.prototype.slice.call(arguments,1).join(" "),title ); self.report.add.apply(this,arguments);}
 
     for(var i=0; importThisOne && i < this.importRules.length; i++) importThisOne = this.importRules[i](tiddler);
-    if(! importThisOne){ console.log(" Not imported Filtered",title); this.report.add(title,"Not imported","Filtered");return false}
+    if(! importThisOne){ reportTiddler(title,"Not imported","Filtered");return false}
 
 
 	if(existingTiddler){
 	     for(var i=0; importThisOne && i < this.conflictRules.length; i++) importThisOne = this.conflictRules[i](tiddler,existingTiddler);
-	     if(! importThisOne){ console.log(" Not imported Conflict",title); this.report.add(title,"Not imported","conflict");return false}
+	     if(! importThisOne){ reportTiddler(title,"Not imported","Conflict");return false}
     }
 	else if(importThisOne)//is new and passed all previous filters?
 		this.report.add(title,"Imported","New");
