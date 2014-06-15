@@ -51,10 +51,11 @@ importWidget.prototype.execute = function() {
 
 	var rules={
      "newestwins" :
-	 function(tiddler,existing){ return tiddler.fields.modified > existing.fields.modified ? true : false;},
+	 function(tiddler,existing){ return tiddler.fields.modified > existing.fields.modified },
      "oldestwins" :
-     function(a,b){ return ! rules.newestwins(a,b) },
-     "longerwins" :  function(tiddler,existing){},
+     function(a,b){ return tiddler.fields.modified < existing.fields.modified },
+     "longertextwins" :
+     function(tiddler,existing){ return tiddler.fields.text.length > existing.fields.text.length },
 	 "includetags" : function(tagsArr){
 	                 return function(tiddler){ var result=true;
 					        for(var i=0; result && i<tagsArr.length;i++){ result = tiddler.hasTag(tagsArr[i]);
@@ -108,7 +109,7 @@ importWidget.prototype.ignoreIdenticalTiddlers = function (tiddler,existing){
            { if(checkedFields.indexOf(field) == -1){
                 checkedFields.push(field);
                 identical = b.hasField(field) && JSON.stringify(bf[field]) == JSON.stringify(af[field]);
-                //console.log("identicals? ",bf[field],af[field],identical);
+                console.log("--identicals ",field,"?",bf[field],af[field],identical);
                 if(!identical) return false;
                 }
             }
@@ -167,7 +168,7 @@ importWidget.prototype.handleImportTiddlersEvent = function(event) {
 			tiddlerFields
 		));
 		if(imported) {
-			self.report.add(title,"Imported");
+			self.report.add(title,"Imported","Overrided");
 		}
 	});
 
