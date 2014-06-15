@@ -42,6 +42,7 @@ Compute the internal state of the widget
 */
 importWidget.prototype.execute = function() {
 	var self=this; this.report=this.reporter();
+	var IMPORTED="Imported",NOTIMPORTED="Not Imported";
 	// Get our parameters
 	var conflictRules = this.getAttribute("conflictRules");
 	conflictRules = conflictRules && conflictRules.length > 0 ? conflictRules.toLowerCase().split(",") : [];
@@ -53,13 +54,16 @@ importWidget.prototype.execute = function() {
 	 "plugins": function(tiddler,existing){
 	 if(tiddler.hasField("plugin-type") && tiddler.hasField("version") && existing.hasField("plugin-type") && existing.hasField("version"))
 		// Reject the incoming plugin if it is older
-		if($tw.utils.checkVersions(existing.fields.version,tiddler.fields.version)) return false;
-		return true
+		var status=$tw.utils.checkVersions(existing.fields.version,tiddler.fields.version) ? false : true;
+
+		return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, "Pugins"] }
 	  },
      "newestwins" :
-	 function(tiddler,existing){ return tiddler.fields.modified > existing.fields.modified },
+	 function(tiddler,existing){ status=tiddler.fields.modified > existing.fields.modified;
+	 return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, status? "Newer than existing" :"Newer already exist" ] } },
      "oldestwins" :
-     function(tiddler,existing){ return tiddler.fields.modified < existing.fields.modified },
+     function(tiddler,existing){ status=tiddler.fields.modified < existing.fields.modified
+     return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, "Older"] }},
      "longertextwins" :
      function(tiddler,existing){ return tiddler.fields.text.length > existing.fields.text.length },
 	 "includetags" : function(tagsArr){
@@ -102,12 +106,13 @@ importWidget.prototype.refresh = function(changedTiddlers) {
 
 importWidget.prototype.ignoreIdenticalTiddlers = function (tiddler,existing){
     console.log(tiddler.fields.title," vs ",existing.fields.title);
-    var checkedFields=[];
+    var checkedFields=[],status,IMPORTED="Imported",NOTIMPORTED="Not Imported";
     if( identicalFields(tiddler,existing) && identicalFields(existing,tiddler) ){
         console.log(" They are Identical!");
-		return false; //not import because are identical
-	}
-    return true;
+		status=false; //not import because are identical
+	}else status=true;
+
+	return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, "Older"] }
 
     function identicalFields(a,b){
         var af=a.fields, bf=b.fields,identical=true;
@@ -126,27 +131,27 @@ importWidget.prototype.ignoreIdenticalTiddlers = function (tiddler,existing){
 
 
 importWidget.prototype.importtiddler = function (tiddler) {
-    var importThisOne = true, title=tiddler.fields.title,self=this;;
+    var importTiddler = {status:true}, title=tiddler.fields.title,self=this;
 	this.newTiddlers=[];
 	var existingTiddler = this.wiki.getTiddler(title);
-	function reportTiddler(title,category/*,subcategories*/)
-	{console.log(Array.prototype.slice.call(arguments,1).join(" "),title ); self.report.add.apply(this,arguments);}
+	function reportTiddler()
+	{console.log(" ",arguments[0][0], arguments[0].slice(1).join(" ")); self.report.add.apply(this,arguments[0]);}
 
-    for(var i=0; importThisOne && i < this.importRules.length; i++) importThisOne = this.importRules[i](tiddler);
-    if(! importThisOne){ reportTiddler(title,"Not imported","Filtered");return false}
+    for(var i=0; importTiddler.status && i < this.importRules.length; i++) importTiddler = this.importRules[i](tiddler);
+    if(! importTiddler.status){ reportTiddler(importTiddler.category);return false}
 
 
 	if(existingTiddler){
-	     for(var i=0; importThisOne && i < this.conflictRules.length; i++) importThisOne = this.conflictRules[i](tiddler,existingTiddler);
-	     if(! importThisOne){ reportTiddler(title,"Not imported","Conflict");return false}
+	     for(var i=0; importTiddler.status && i < this.conflictRules.length; i++) importTiddler = this.conflictRules[i](tiddler,existingTiddler);
+	     if(! importTiddler.status){ reportTiddler(importTiddler.category);return false}
     }
-	else if(importThisOne)//is new and passed all previous filters?
+	else if(importTiddler.status)//is new and passed all previous filters?
 		this.report.add(title,"Imported","New");
 
 	// Fall through to adding the tiddler
 	//$tw.wiki.addTiddler(tiddler);
 	console.log("Imported ",tiddler.fields.title);
-	return true;
+	return importTiddler.status;
 };
 
 

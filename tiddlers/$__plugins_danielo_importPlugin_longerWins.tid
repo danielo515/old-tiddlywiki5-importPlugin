@@ -1,8 +1,8 @@
 caption: The longer wins
 created: 20140613114155647
-modified: 20140614131227117
-tags: $:/tags/rules/conflict
+modified: 20140615132044493
+tags: $:/tags/rules/conflict $:/tags/conflictRule
 title: $:/plugins/danielo/importPlugin/longerWins
 type: text/vnd.tiddlywiki
 
-longerwins
+longertextwins
