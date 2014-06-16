@@ -1,7 +1,7 @@
 caption: Newest wins
 created: 20140613114050037
-modified: 20140615193418286
-tags: $:/tags/rules/conflict
+modified: 20140616174323412
+tags: $:/tags/rules/conflict $:/tags/conflictRule
 title: $:/plugins/danielo/importPlugin/newestWins
 type: text/vnd.tiddlywiki
 

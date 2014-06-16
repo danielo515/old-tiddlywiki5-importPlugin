@@ -18,6 +18,8 @@ var importWidget = function(parseTreeNode,options) {
 	this.initialise(parseTreeNode,options);
 	this.addEventListeners([
 	{type: "tw-import-tiddlers", handler: "handleImportTiddlersEvent"}
+	{type: "tw-confirm-import", handler: "handleConfirmImport"}
+
 	]);
 };
 
@@ -131,17 +133,18 @@ var rulesStore={
 	  },
      "newestwins" :
 	 function(tiddler,existing){ var status=tiddler.fields.modified > existing.fields.modified;
-	 return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, status? "Newer than existing" :"Newer already exist" ] } },
+	 return getResult(status, tiddler.fields.title , status? "Newer than existing" :"Newer already exist") },
      "oldestwins" :
      function(tiddler,existing){ var status=tiddler.fields.modified < existing.fields.modified
-     return {status:status , category : [tiddler.fields.title,status ? IMPORTED : NOTIMPORTED, "Older"] }},
+     return  getResult(status, tiddler.fields.title , "Older")},
      "longertextwins" :
-     function(tiddler,existing){ return tiddler.fields.text.length > existing.fields.text.length },
+     function(tiddler,existing){ var status=tiddler.fields.text.length > existing.fields.text.length
+     return getResult(status, tiddler.fields.title , "Shorter tan current")},
 	 "includetags" : function(tagsArr){
 	                 return function(tiddler){ var result=true;
 					        for(var i=0; result && i<tagsArr.length;i++){ result = tiddler.hasTag(tagsArr[i]);
 							console.log("Tag ",tagsArr[i],result);}
-							return result;
+							return getResult(status, tiddler.fields.title , "Filtered");
 							}  },
 	"excludetags" : function(tagsArr){ return ! this.includetags(tagsArr) },
     };
@@ -178,6 +181,10 @@ importWidget.prototype.importtiddler = function (tiddler) {
 };
 
 
+importWidget.prototype.handleConfirmImport = function(event){
+    console.log("Import confirmed! ");
+
+};
 // Import JSON tiddlers
 importWidget.prototype.handleImportTiddlersEvent = function(event) {
 	var self = this;
