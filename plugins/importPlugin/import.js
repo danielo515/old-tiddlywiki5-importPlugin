@@ -17,7 +17,7 @@ var widget = require("$:/core/modules/widgets/widget.js").widget;
 var importWidget = function(parseTreeNode,options) {
 	this.initialise(parseTreeNode,options);
 	this.addEventListeners([
-	{type: "tw-import-tiddlers", handler: "handleImportTiddlersEvent"}
+	{type: "tw-import-tiddlers", handler: "handleImportTiddlersEvent"},
 	{type: "tw-confirm-import", handler: "handleConfirmImport"}
 
 	]);
@@ -140,12 +140,16 @@ var rulesStore={
      "longertextwins" :
      function(tiddler,existing){ var status=tiddler.fields.text.length > existing.fields.text.length
      return getResult(status, tiddler.fields.title , "Shorter tan current")},
-	 "includetags" : function(tagsArr){
-	                 return function(tiddler){ var result=true;
-					        for(var i=0; result && i<tagsArr.length;i++){ result = tiddler.hasTag(tagsArr[i]);
-							console.log("Tag ",tagsArr[i],result);}
-							return getResult(status, tiddler.fields.title , "Filtered");
-							}  },
+	 "includetags" :
+	 function(tagsArr){
+         return function(tiddler){
+                        var status=true;
+					    for(var i=0; status && i<tagsArr.length;i++){
+					        status = tiddler.hasTag(tagsArr[i]);
+							console.log("Tag ",tagsArr[i],status);
+							}
+							return status;
+						}},
 	"excludetags" : function(tagsArr){ return ! this.includetags(tagsArr) },
     };
 
@@ -182,12 +186,13 @@ importWidget.prototype.importtiddler = function (tiddler) {
 
 
 importWidget.prototype.handleConfirmImport = function(event){
-    console.log("Import confirmed! ");
+    console.log("Import confirmed! ",this.importList);
 
 };
 // Import JSON tiddlers
 importWidget.prototype.handleImportTiddlersEvent = function(event) {
 	var self = this;
+	this.importList=[];
 	// Get the tiddlers
 	var tiddlers = [];
 	try {
@@ -205,6 +210,7 @@ importWidget.prototype.handleImportTiddlersEvent = function(event) {
 		));
 		if(imported) {
 			self.report.add(title,"Imported","Overrided");
+			self.importList.push(title);
 		}
 	});
 
@@ -220,10 +226,10 @@ importWidget.prototype.generateReport= function(){
 
 	   var tiddlerFields = {
 			title: title,
-			text: ""
+			text: '<$button message="tw-confirm-import">Confirm</$button>\n'
 		};
 
-		tiddlerFields.text=this.report.compose();
+		tiddlerFields.text+=this.report.compose();
 
 
 		this.wiki.addTiddler(new $tw.Tiddler(
