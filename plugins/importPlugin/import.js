@@ -42,8 +42,8 @@ Compute the internal state of the widget
 */
 importWidget.prototype.execute = function() {
 	var self=this; this.report=this.reporter();
-	var IMPORTED="Imported",NOTIMPORTED="Not Imported";
 	// Get our parameters
+	this.navigate=this.getAttribute("navigate","no").toLowerCase();
 	var conflictRules = this.getAttribute("conflictRules");
 	conflictRules = conflictRules && conflictRules.length > 0 ? conflictRules.toLowerCase().split(",") : [];
 	console.log(conflictRules);
@@ -208,7 +208,7 @@ importWidget.prototype.handleImportTiddlersEvent = function(event) {
 };
 
 importWidget.prototype.generateReport= function(){
-	var title = this.wiki.generateNewTitle("$:/temp/ImportReport"),self=this;
+	var title ="$:/temp/ImportReport",self=this;//this.wiki.generateNewTitle("$:/temp/ImportReport")
 
 
 	   var tiddlerFields = {
@@ -225,7 +225,7 @@ importWidget.prototype.generateReport= function(){
 			self.wiki.getModificationFields()
 		));
 
-
+ if(this.navigate !== "no")
 	this.dispatchEvent({
 		type: "tw-navigate",
 		navigateTo: title,
