@@ -164,26 +164,26 @@ return {
 
 
 importWidget.prototype.importtiddler = function (tiddler) {
-    var importTiddler = {status:true}, title=tiddler.fields.title,self=this;
-	this.newTiddlers=[];
-	var existingTiddler = this.wiki.getTiddler(title);
-	function reportTiddler()
+    var importTiddler = {status:true}, title=tiddler.fields.title,self=this,
+    existingTiddler = this.wiki.getTiddler(title);
+	
+    function reportTiddler()
 	{console.log(" ",arguments[0][0], arguments[0].slice(1).join(" ")); self.report.add.apply(this,arguments[0]);}
 
     for(var i=0; importTiddler.status && i < this.importRules.length; i++) importTiddler = this.importRules[i](tiddler);
-    if(! importTiddler.status){ reportTiddler(importTiddler.category);return false}
-
 
 	if(existingTiddler){
 	     for(var i=0; importTiddler.status && i < this.conflictRules.length; i++) importTiddler = this.conflictRules[i](tiddler,existingTiddler);
-	     if(! importTiddler.status){ reportTiddler(importTiddler.category);return false}
     }
-	else if(importTiddler.status)//is new and passed all previous filters?
-		this.report.add(title,"Imported","New");
-
-	// Fall through to adding the tiddler
-	//$tw.wiki.addTiddler(tiddler);
-	console.log("Imported ",tiddler.fields.title);
+	
+    if(! importTiddler.status){ 
+        reportTiddler(importTiddler.category);return false}
+    else{ if(existingTiddler)
+            this.report.add(title,"Imported","New");
+          else
+            this.report.add(title,"Imported","Overriden");
+        }
+    
 	return importTiddler.status;
 };
 
@@ -208,7 +208,6 @@ importWidget.prototype.handleImportTiddlersEvent = function(event) {
         var tiddler=new $tw.Tiddler(self.wiki.getCreationFields(),self.wiki.getModificationFields(),tiddlerFields);
 		var imported = self.importtiddler(tiddler);
 		if(imported) {
-			self.report.add(title,"Imported","Overrided");
 			self.importList.push(tiddler);
 		}
 	});
