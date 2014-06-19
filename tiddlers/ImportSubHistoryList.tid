@@ -1,0 +1,87 @@
+created: 20140616173504186
+current-tiddler: $:/StoryList
+modified: 20140619102838970
+title: ImportSubHistoryList
+type: application/json
+
+[
+    {
+        "title": "$:/temp/ImportReport 1"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "Manual",
+        "fromPageRect": {
+            "top": 424.6875,
+            "left": 125,
+            "width": 45,
+            "right": 170,
+            "bottom": 440.6875,
+            "height": 16
+        }
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/temp/ImportReport"
+    },
+    {
+        "title": "$:/StoryList",
+        "fromPageRect": {
+            "top": 395.53125,
+            "left": 125,
+            "width": 72,
+            "right": 197,
+            "bottom": 411.53125,
+            "height": 16
+        }
+    }
+]
