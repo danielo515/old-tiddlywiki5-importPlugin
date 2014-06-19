@@ -178,10 +178,10 @@ importWidget.prototype.importtiddler = function (tiddler) {
 	
     if(! importTiddler.status){ 
         reportTiddler(importTiddler.category);return false}
-    else{ if(existingTiddler)
-            this.report.add(title,"Imported","New");
-          else
+    else{ if(existingTiddler) //filters passed but not new
             this.report.add(title,"Imported","Overriden");
+          else//filters passed and new
+            this.report.add(title,"Imported","New");
         }
     
 	return importTiddler.status;
