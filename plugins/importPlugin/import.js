@@ -6,85 +6,88 @@ module-type: widget
 
 \*/
 
-(function(){
+(function () {
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+    /*jslint node: true, browser: true */
+    /*global $tw: false */
+    "use strict";
 
-var widget = require("$:/core/modules/widgets/widget.js").widget;
+    var widget = require("$:/core/modules/widgets/widget.js").widget;
 
-var importWidget = function(parseTreeNode,options) {
-	this.initialise(parseTreeNode,options);
-	this.addEventListeners([
-	{type: "tw-import-tiddlers", handler: "handleImportTiddlersEvent"},
-	{type: "tw-confirm-import", handler: "handleConfirmImport"}
+    var importWidget = function (parseTreeNode, options) {
+        this.initialise(parseTreeNode, options);
+        this.addEventListeners([
+            {type: "tw-import-tiddlers", handler: "handleImportTiddlersEvent"},
+            {type: "tw-confirm-import", handler: "handleConfirmImport"}
 
-	]);
-};
+        ]);
+    };
+
+
+    /*
+    Inherit from the base widget class
+    */
+    importWidget.prototype = new widget();
+
+    /*
+    Render this widget into the DOM
+    */
+    importWidget.prototype.render = function (parent, nextSibling) {
+        this.parentDomNode = parent;
+        this.computeAttributes();
+        this.execute();
+        this.renderChildren(parent, nextSibling);
+    };
+
 
 /*
-Inherit from the base widget class
-*/
-importWidget.prototype = new widget();
+    Compute the internal state of the widget
+    */
+    importWidget.prototype.execute = function () {
+        var self = this;
+        this.report = this.reporter();
+        this.wiki.deleteTiddler("$:/temp/ImportReport");
+        // Get our parameters
+        this.navigate = this.getAttribute("navigate", "no").toLowerCase();
+        var conflictRules = this.getAttribute("conflictRules");
+        conflictRules = conflictRules && conflictRules.length > 0 ? conflictRules.toLowerCase().split(",") : [];
+        console.log(conflictRules);
+        var importrules = this.getAttribute("importRules");
+        importrules = importrules && importrules.length > 0 ? importrules.split(";") : [];
 
-/*
-Render this widget into the DOM
-*/
-importWidget.prototype.render = function(parent,nextSibling) {
-	this.parentDomNode = parent;
-	this.computeAttributes();
-	this.execute();
-	this.renderChildren(parent,nextSibling);
-};
+        var rules = this._rules();
 
+        this.conflictRules = [ rules.getRule("plugins"), rules.getRule("ignoreIdenticalTiddlers") ]; //ignore Identical the very first rule
+        this.importRules=[];
+        //construct the import rules array
+        importrules.forEach(
+            function (rule) { rule = rule.split(":");
+                             self.importRules.push(
+                                 rules.getRule(rule[0].toLowerCase())(rule[1].split(","))
+                                 ); }
+                            );
+        //construct the conflict rules array
+        for (var i=0; i<conflictRules.length; i++) this.conflictRules.push( rules.getRule(conflictRules[i]) );
 
-/*
-Compute the internal state of the widget
-*/
-importWidget.prototype.execute = function() {
-	var self=this; this.report=this.reporter();
-	// Get our parameters
-	this.navigate=this.getAttribute("navigate","no").toLowerCase();
-	var conflictRules = this.getAttribute("conflictRules");
-	conflictRules = conflictRules && conflictRules.length > 0 ? conflictRules.toLowerCase().split(",") : [];
-	console.log(conflictRules);
-	var importrules = this.getAttribute("importRules");
-	importrules = importrules && importrules.length > 0 ? importrules.split(";") : [];
+        // Construct the child widgets
+        this.makeChildWidgets();
+    };
 
-	var rules=this._rules();
-
-    this.conflictRules=[ rules.getRule("plugins"), rules.getRule("ignoreIdenticalTiddlers") ]; //ignore Identical the very first rule
-	this.importRules=[];
-	//construct the import rules array
-	importrules.forEach(
-	    function(rule) { rule=rule.split(":");
-		                 self.importRules.push(
-		                     rules.getRule( rule[0].toLowerCase() )( rule[1].split(",") )
-		                     )}
-						);
-	//construct the conflict rules array
-    for(var i=0; i<conflictRules.length; i++) this.conflictRules.push( rules.getRule(conflictRules[i]) );
-
-	// Construct the child widgets
-	this.makeChildWidgets();
-};
-
-/*
-Selectively refreshes the widget if needed. Returns true if the widget or any of its children needed re-rendering
-*/
-importWidget.prototype.refresh = function(changedTiddlers) {
-	var changedAttributes = this.computeAttributes();
-	if(changedAttributes.conflictRules || changedAttributes.importRules) {
-		this.refreshSelf();
-		return true;
-	} else {
-		return this.refreshChildren(changedTiddlers);
-	}
-};
+    /*
+    Selectively refreshes the widget if needed. Returns true if the widget or any of its children needed re-rendering
+    */
+    importWidget.prototype.refresh = function(changedTiddlers) {
+        var changedAttributes = this.computeAttributes();
+        if(changedAttributes.conflictRules || changedAttributes.importRules) {
+            this.refreshSelf();
+            return true;
+        } else {
+            return this.refreshChildren(changedTiddlers);
+        }
+    };
 
 
-/*Rules closure*/
+/*Rules module*/
 importWidget.prototype._rules=function(){
 var IMPORTED="Imported",NOTIMPORTED="Not Imported";
 
@@ -135,28 +138,28 @@ var rulesStore={
 	 function(tiddler,existing){ var status=tiddler.fields.modified > existing.fields.modified;
 	 return getResult(status, tiddler.fields.title , status? "Newer than existing" :"Newer already exist") },
      "oldestwins" :
-     function(tiddler,existing){ var status=tiddler.fields.modified < existing.fields.modified
+     function(tiddler,existing){ var status=tiddler.fields.modified < existing.fields.modified;
      return  getResult(status, tiddler.fields.title , "Older")},
      "longertextwins" :
-     function(tiddler,existing){ var status=tiddler.fields.text.length > existing.fields.text.length
+     function(tiddler,existing){ var status=tiddler.fields.text.length > existing.fields.text.length;
      return getResult(status, tiddler.fields.title , "Shorter tan current")},
 	 "includetags" :
 	 function(tagsArr){
          return function(tiddler){
                         var status=true;
-					    for(var i=0; status && i<tagsArr.length;i++){
+                        for(var i=0; status && i<tagsArr.length;i++){
 					        status = tiddler.hasTag(tagsArr[i]);
 							console.log("Tag ",tagsArr[i],status);
 							}
-							return status;
+							return getResult(status, tiddler.fields.title , "Filtered");
 						}},
 	"excludetags" : function(tagsArr){ return ! this.includetags(tagsArr) },
     };
 
 
 return {
-         getRule : function(ruleName){ return rulesStore[ruleName] }
-       }
+         getRule : function(ruleName){ return rulesStore[ruleName]}
+       };
 };
 
 
@@ -202,15 +205,11 @@ importWidget.prototype.handleImportTiddlersEvent = function(event) {
 	// Process each tiddler
 	$tw.utils.each(tiddlers,function(tiddlerFields) {
 		var title = tiddlerFields.title;
-		// Add it to the store
-		var imported = self.importtiddler(new $tw.Tiddler(
-			self.wiki.getCreationFields(),
-			self.wiki.getModificationFields(),
-			tiddlerFields
-		));
+        var tiddler=new $tw.Tiddler(self.wiki.getCreationFields(),self.wiki.getModificationFields(),tiddlerFields);
+		var imported = self.importtiddler(tiddler);
 		if(imported) {
 			self.report.add(title,"Imported","Overrided");
-			self.importList.push(title);
+			self.importList.push(tiddler);
 		}
 	});
 
@@ -223,10 +222,9 @@ importWidget.prototype.handleImportTiddlersEvent = function(event) {
 importWidget.prototype.generateReport= function(){
 	var title ="$:/temp/ImportReport",self=this;//this.wiki.generateNewTitle("$:/temp/ImportReport")
 
-
-	   var tiddlerFields = {
+       var tiddlerFields = {
 			title: title,
-			text: '<$button message="tw-confirm-import">Confirm</$button>\n'
+			text: '\n<$button message="tw-confirm-import">Confirm</$button>\n\n'
 		};
 
 		tiddlerFields.text+=this.report.compose();
@@ -250,7 +248,7 @@ importWidget.prototype.generateReport= function(){
 
 };
 
-
+/*Module that takes care of the report*/
 importWidget.prototype.reporter = function(){
 var store={},text="",mainList=[];
 
@@ -267,7 +265,7 @@ if( element.hasOwnProperty("list") )
 else
      for(var el in element){
         text+= header + el + "\n";
-		    iterateStore(element[el],header+"!")
+		iterateStore(element[el],header+"!");
 		}
 }
 
@@ -280,7 +278,7 @@ function add(element/*,topics and subtopics*/){
 
    function append(topic,subtopics){
         if(subtopics.length > 0){
-            append(topic[subtopics[0]]= topic[subtopics[0]] || {} ,subtopics.slice(1))
+            append(topic[subtopics[0]]= topic[subtopics[0]] || {} ,subtopics.slice(1));
         }else
             if(topic.hasOwnProperty("list")) topic.list.push(element); else topic.list=[element];
    }

@@ -6,11 +6,11 @@ tags: macros
 creator:Danielo Rodriguez
 
 \*/
-(function(){
+(function () {
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+    /*jslint node: true, browser: true */
+    /*global $tw: false */
+    "use strict";
 
 /*
 Information about this macro

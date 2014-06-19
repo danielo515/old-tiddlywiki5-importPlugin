@@ -1,15 +1,26 @@
 created: 20140611164900211
-modified: 20140613134309026
+modified: 20140617170133854
 title: testImport
 type: text/vnd.tiddlywiki
 
 \define rules()$(rule)$
 <$set name="rule" value=<<concatenate "[tag[$:/tags/conflictRule]]" ",">> >
-<$importwidget conflictRules=<<rules>> >
-<$browse/>
-</$importwidget>
-</$set>
 
+<$navigator story="ImportSubStoryList" history="ImportSubHistoryList">
+
+<$importwidget conflictRules=<<rules>> navigate="yes">
+
+<$browse/>
+
+
+!!In case of conflict
 <$list filter="[tag[$:/tags/rules/conflict]]">
 <$checkbox tiddler={{!!title}} tag="$:/tags/conflictRule">{{!!caption}}</$checkbox>
 </$list>
+<$list filter="[list[ImportSubStoryList]]" history="ImportSubHistoryList">
+<$transclude mode="block" template="reportTemplate"/>
+</$list>
+</$importwidget>
+</$navigator>
+</$set>
+
